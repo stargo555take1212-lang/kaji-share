@@ -564,7 +564,6 @@ function renderSettings(){
   html+='<button class="add-link" data-action="add-record">&#xff0b; 美容の項目を追加</button>';
   html+='</div>';
   html+='<button class="reset-link" data-action="clear-history">記録をすべて削除（部屋・家事・美容の項目設定はそのまま）</button>';
-  html+='<button class="reset-link" data-action="reset-all">初期設定にリセット</button>';
   document.getElementById('content').innerHTML=html;
 }
 
@@ -666,15 +665,6 @@ document.addEventListener('click',function(e){
       var inp=document.querySelector('[data-action="room-name"][data-room-id="'+rm.id+'"]');
       if(inp){ inp.focus(); inp.select(); }
     },0); return;
-  }
-  if(action==='reset-all'){
-    pendingDelete=(pendingDelete==='reset-confirm')?null:'reset-confirm';
-    if(pendingDelete===null){ state=defaultState(); saveState(); render(); }
-    else{
-      el.textContent='もう一度押すと初期設定に戻ります';
-      setTimeout(function(){ if(pendingDelete==='reset-confirm'){ pendingDelete=null; render(); } },3000);
-    }
-    return;
   }
   if(action==='clear-history'){
     pendingDelete=(pendingDelete==='clear-history-confirm')?null:'clear-history-confirm';
