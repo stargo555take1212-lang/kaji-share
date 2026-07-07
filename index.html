@@ -62,6 +62,8 @@ body{
 .task-meta{font-size:11.5px;color:var(--muted);margin:2px 0 0;line-height:1.5;}
 .task-status{font-size:11.5px;font-weight:700;margin:2px 0 0;}
 .hist-text{font-size:10.5px;color:var(--muted);margin:4px 0 0;font-family:'JetBrains Mono',monospace;}
+.hist-toggle{display:block;width:100%;text-align:left;border:none;background:transparent;font-size:10.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;padding:4px 0 0;margin:0;cursor:pointer;}
+.hist-toggle:hover{color:var(--accent);}
 .heatmap{
   display:grid;
   grid-template-rows:repeat(7,10px);
@@ -142,6 +144,7 @@ var isSaving = false;
 var state = null;
 var activeTab = 'home';
 var pendingDelete = null;
+var expandedItems = {};
 
 // ===== Utilities =====
 function uid(){ return Math.random().toString(36).slice(2,9); }
@@ -424,6 +427,7 @@ function taskCardHtml(item,kind){
   var doneFlag=isDoneToday(item);
   var freqLabel=item.intervalDays===1?'毎日':item.intervalDays+'日ごと';
   var hist=histText(item);
+  var expanded=!!expandedItems[kind+':'+item.id];
   var html='<div class="task-card">';
   html+='<div class="task-top">';
   html+='<button class="check-btn '+(doneFlag?'done':'')+'" data-action="toggle-done" data-kind="'+kind+'" data-id="'+item.id+'" aria-label="'+(doneFlag?'記録を取り消す':'今日やったことにする')+'">&#10003;</button>';
@@ -431,9 +435,10 @@ function taskCardHtml(item,kind){
   html+='<p class="task-name'+(doneFlag?' done':'')+'">'+esc((item.icon?item.icon+' ':''))+esc(item.name)+'</p>';
   html+='<p class="task-meta">'+freqLabel+'</p>';
   html+='<p class="task-status" style="color:'+statusColor(st.kind)+';"> '+esc(st.label)+'</p>';
-  if(hist) html+='<p class="hist-text">'+esc(hist)+'</p>';
   html+='</div></div>';
-  html+=heatmapHtml(item,kind);
+  var toggleLabel=expanded?'履歴を閉じる ▲':(hist?esc(hist)+' · 履歴を見る ▾':'履歴を見る ▾');
+  html+='<button class="hist-toggle" data-action="toggle-heatmap" data-kind="'+kind+'" data-id="'+item.id+'">'+toggleLabel+'</button>';
+  if(expanded) html+=heatmapHtml(item,kind);
   html+='</div>';
   return html;
 }
@@ -594,6 +599,12 @@ document.addEventListener('click',function(e){
     }
     item2.lastDone=item2.history.length?item2.history[0]:null;
     saveState(); render();
+    return;
+  }
+  if(action==='toggle-heatmap'){
+    var hk=el.dataset.kind+':'+el.dataset.id;
+    expandedItems[hk]=!expandedItems[hk];
+    render();
     return;
   }
   if(action==='manual-sync'){ showToast('同期しています…'); pollServer(); return; }
