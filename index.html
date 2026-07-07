@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>おそうじシェア</title>
+<title>くらしログ</title>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -121,14 +121,14 @@ body{
 <body>
 <div class="app">
   <div class="app-head">
-    <h1 class="app-title">🧼 おそうじシェア</h1>
+    <h1 class="app-title">📔 くらしログ</h1>
     <span class="sync-pill" id="sync-status"><span class="sync-dot"></span>準備中</span>
   </div>
   <div id="content"><div class="loading">読み込み中…</div></div>
 </div>
 <div class="tabbar">
   <button class="tab-btn active" data-action="switch-tab" data-tab="home">家事</button>
-  <button class="tab-btn" data-action="switch-tab" data-tab="records">記録</button>
+  <button class="tab-btn" data-action="switch-tab" data-tab="records">美容</button>
   <button class="tab-btn" data-action="switch-tab" data-tab="settings">設定</button>
 </div>
 <div class="toast" id="toast"></div>
@@ -229,8 +229,10 @@ function defaultState(){
       {id:'t7',roomId:'r7',name:'くん煙剤で害虫対策',intervalDays:60,lastDone:back(50),history:[back(50),back(110)]}
     ],
     records:[
-      {id:'rec1',name:'髪を切る',icon:'💇',intervalDays:45,lastDone:back(20),history:[back(20),back(65),back(110)]},
-      {id:'rec2',name:'脱毛',icon:'✨',intervalDays:30,lastDone:back(10),history:[back(10),back(40),back(70),back(100)]}
+      {id:'rec1',name:'けんちゃん散髪',icon:'💇',intervalDays:45,lastDone:null,history:[]},
+      {id:'rec1b',name:'パパ散髪',icon:'💇',intervalDays:45,lastDone:null,history:[]},
+      {id:'rec2',name:'脱毛',icon:'✨',intervalDays:30,lastDone:back(10),history:[back(10),back(40),back(70),back(100)]},
+      {id:'rec3',name:'クリーニング',icon:'🧺',intervalDays:90,lastDone:back(30),history:[back(30),back(120)]}
     ]
   };
 }
@@ -485,7 +487,7 @@ function renderRecords(){
   });
   var html='';
   if(recs.length===0){
-    html='<p class="empty-note">設定タブから記録項目を追加してください</p>';
+    html='<p class="empty-note">設定タブから美容の項目を追加してください</p>';
   }else{
     recs.forEach(function(r){ html+=taskCardHtml(r,'record'); });
   }
@@ -537,7 +539,7 @@ function renderSettings(){
     html+='</div>';
   });
   html+='<button class="add-room-btn" data-action="add-room">&#xff0b; 場所を追加</button>';
-  html+='<p class="section-title">記録の項目（髪・脱毛など）</p>';
+  html+='<p class="section-title">美容の項目（髪・脱毛・クリーニングなど）</p>';
   html+='<div class="room-card">';
   state.records.forEach(function(r){
     html+='<div class="setting-task-row">';
@@ -553,7 +555,7 @@ function renderSettings(){
     }
     html+='</div>';
   });
-  html+='<button class="add-link" data-action="add-record">&#xff0b; 記録項目を追加</button>';
+  html+='<button class="add-link" data-action="add-record">&#xff0b; 美容の項目を追加</button>';
   html+='</div>';
   html+='<button class="reset-link" data-action="reset-all">初期設定にリセット</button>';
   document.getElementById('content').innerHTML=html;
@@ -643,7 +645,7 @@ document.addEventListener('click',function(e){
     },0); return;
   }
   if(action==='add-record'){
-    var r={id:uid(),name:'新しい記録',icon:'✨',intervalDays:30,lastDone:null,history:[]};
+    var r={id:uid(),name:'新しい美容項目',icon:'✨',intervalDays:30,lastDone:null,history:[]};
     state.records.push(r); saveState(); render();
     setTimeout(function(){
       var inp=document.querySelector('[data-action="record-name"][data-record-id="'+r.id+'"]');
@@ -683,7 +685,7 @@ document.addEventListener('change',function(e){
     var v=parseInt(el.value,10);
     findItem('task',el.dataset.taskId).intervalDays=(isNaN(v)||v<1)?1:Math.min(v,365); saveState(); render();
   }else if(action==='record-name'){
-    findItem('record',el.dataset.recordId).name=el.value.trim()||'新しい記録'; saveState(); render();
+    findItem('record',el.dataset.recordId).name=el.value.trim()||'新しい美容項目'; saveState(); render();
   }else if(action==='record-icon'){
     findItem('record',el.dataset.recordId).icon=el.value; saveState();
   }else if(action==='record-interval'){
