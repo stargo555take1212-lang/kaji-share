@@ -563,7 +563,11 @@ function renderSettings(){
   });
   html+='<button class="add-link" data-action="add-record">&#xff0b; 美容の項目を追加</button>';
   html+='</div>';
-  html+='<button class="reset-link" data-action="clear-history">記録をすべて削除（部屋・家事・美容の項目設定はそのまま）</button>';
+  if(pendingDelete==='clear-history-confirm'){
+    html+='<div style="text-align:center;margin-top:18px;"><span class="confirm-row" style="justify-content:center;">記録をすべて削除しますか？<button class="delete-x" data-action="confirm-clear-history" style="color:var(--warn);">はい</button><button class="delete-x" data-action="cancel-delete">やめる</button></span></div>';
+  }else{
+    html+='<button class="reset-link" data-action="clear-history">記録をすべて削除（部屋・家事・美容の項目設定はそのまま）</button>';
+  }
   document.getElementById('content').innerHTML=html;
 }
 
@@ -666,16 +670,11 @@ document.addEventListener('click',function(e){
       if(inp){ inp.focus(); inp.select(); }
     },0); return;
   }
-  if(action==='clear-history'){
-    pendingDelete=(pendingDelete==='clear-history-confirm')?null:'clear-history-confirm';
-    if(pendingDelete===null){
-      state.tasks.forEach(function(t){ t.lastDone=null; t.history=[]; });
-      state.records.forEach(function(r){ r.lastDone=null; r.history=[]; });
-      saveState(); render();
-    }else{
-      el.textContent='もう一度押すと全ての記録日を削除します';
-      setTimeout(function(){ if(pendingDelete==='clear-history-confirm'){ pendingDelete=null; render(); } },3000);
-    }
+  if(action==='clear-history'){ pendingDelete='clear-history-confirm'; render(); return; }
+  if(action==='confirm-clear-history'){
+    state.tasks.forEach(function(t){ t.lastDone=null; t.history=[]; });
+    state.records.forEach(function(r){ r.lastDone=null; r.history=[]; });
+    pendingDelete=null; saveState(); render();
     return;
   }
 });
